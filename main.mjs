@@ -2,31 +2,24 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import os from "os";
+import colors from "colors";
+colors.enable();
 
 const app = express();
 const PORT = 80;
 const pub = path.join(process.cwd(), "public");
-
-app.use(express.static(path.join(process.cwd(), "public")));
-
-console.log(
-    `Serving files from: ${pub} | So Place your files in here that you want to share .`,
-);
-
-const getLocalIp = () => {
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-        for (const iface of interfaces[name]) {
-            // Skip internal (127.0.0.1) and non-IPv4 addresses
-            if (iface.family === "IPv4" && !iface.internal) {
-                return iface.address;
-            }
-        }
-    }
-    return "127.0.0.1";
+const logger = (req, res, next) => {
+    console.log(`Received request for: ${req.url}`.cyan);
+    next();
 };
 
-console.log(`Your local network IP is: ${getLocalIp()}`);
+app.use(express.static(path.join(process.cwd(), "public")));
+app.use(logger);
+
+console.log(
+    `Serving files from: ${pub} | So Place your files in here that you want to share .`
+        .yellow.bold,
+);
 
 // ---------------------------------------------------------------------
 // ---------------------------------------------------------------------
@@ -62,6 +55,25 @@ public/[PUT YOUR FILENAME HERE]
     res.send(text);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+const printLocalIPAddresses = () => {
+    const interfaces = os.networkInterfaces();
+    console.log(
+        "\n\n[LOCAL IP ADDRESS] (Likely addresses where server is accessible):"
+            .green.bold,
+    );
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === "IPv4" && !iface.internal) {
+                console.log(`${iface.address} | ${name}`);
+            }
+        }
+    }
+};
+
+app.listen(PORT, "0.0.0.0", () => {
+    printLocalIPAddresses();
+    console.log(
+        `Server is running on http://[ONE OF THE LOCAL IP ADDRESSES]:${PORT}`
+            .blue.bold,
+    );
 });
