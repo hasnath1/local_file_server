@@ -14,11 +14,11 @@ const logger = (req, res, next) => {
     next();
 };
 
-app.use(express.static(path.join(process.cwd(), "public")));
 app.use(logger);
+app.use(express.static(pub));
 
 console.log(
-    `Serving files from: ${pub} | So Place your files in here that you want to share .`
+    `Serving files from: ${pub} \nSo Place your files in here that you want to share .`
         .yellow.bold,
 );
 
@@ -37,6 +37,12 @@ app.get("/", (req, res) => {
         <title>Document</title>
     </head>
     <body>
+
+    <h1>Welcome to the Local File Server</h1>
+    <p>Here are the files available in the public directory:</p>
+
+    <br>
+
       <ul>
         ${fs
             .readdirSync(pub)
@@ -73,8 +79,5 @@ const printLocalIPAddresses = () => {
 
 app.listen(PORT, "0.0.0.0", () => {
     printLocalIPAddresses();
-    console.log(
-        `Server is running on http://[ONE OF THE LOCAL IP ADDRESSES]:${PORT}`
-            .blue.bold,
-    );
+    console.log(`Server is running on http://[IP ADDRESS]:${PORT}`.blue.bold);
 });
