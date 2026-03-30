@@ -9,7 +9,8 @@ const app = express();
 const PORT = 80;
 const pub = path.join(process.cwd(), "public");
 const logger = (req, res, next) => {
-    console.log(`Received request for: ${req.url}`.cyan);
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`Received request for: ${req.url} | ${timestamp}`.cyan);
     next();
 };
 
